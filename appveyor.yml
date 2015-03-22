@@ -28,13 +28,16 @@ init:
 - '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%'
 
 install:
+- echo "Installing..."
 - cd %APPVEYOR_BUILD_FOLDER%
 - call .appveyor\install.bat
 
 build_script:
+- echo "Building..."
 - cd %APPVEYOR_BUILD_FOLDER%
 - call .appveyor\build.bat
 
 test_script:
+- echo "Testing..."
 - cd %APPVEYOR_BUILD_FOLDER%\test
 - lunit test.lua
