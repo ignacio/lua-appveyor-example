@@ -20,6 +20,7 @@ appveyor DownloadFile %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
 cd luarocks-%LUAROCKS_VER%-win32
 install.bat /LUA c:\lua%LUA_VER% /Q /LV %LUA_SHORTV%
 set PATH=%PATH%;C:\Program Files (x86)\LuaRocks\2.2
+echo %PATH%
 set LUA_PATH="C:\Program Files (x86)\LuaRocks\2.2\lua\?.lua;C:\Program Files (x86)\LuaRocks\2.2\lua\?\init.lua;C:\Program Files (x86)\LuaRocks\systree\share\lua\%LUA_SHORTV%\?.lua;C:\Program Files (x86)\LuaRocks\systree\share\lua\%LUA_SHORTV%\?\init.lua"
 set LUA_CPATH="C:\Program Files (x86)\LuaRocks\systree\lib\lua\%LUA_SHORTV%\?.dll"
 luarocks --version
