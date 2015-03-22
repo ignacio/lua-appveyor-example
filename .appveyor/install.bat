@@ -23,6 +23,6 @@ call install.bat /LUA c:\lua%LUA_VER% /Q /LV %LUA_SHORTV%
 set PATH=%PATH%;%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\
 set LUA_PATH=%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\lua\?.lua;%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\lua\?\init.lua;%ProgramFiles(x86)%\LuaRocks\systree\share\lua\%LUA_SHORTV%\?.lua;%ProgramFiles(x86)%\LuaRocks\systree\share\lua\%LUA_SHORTV%\?\init.lua
 set LUA_CPATH=%ProgramFiles(x86)%\LuaRocks\systree\lib\lua\%LUA_SHORTV%\?.dll
-luarocks --version
+call luarocks --version
 :: Install lunitx
 luarocks install lunitx
