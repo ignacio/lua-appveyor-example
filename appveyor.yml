@@ -31,13 +31,13 @@ before_build:
 - echo "Installing external deps"
 
 build_script:
-- call luarocks make rockspecs/foo-scm-0.rockspec
+- luarocks make rockspecs/foo-scm-0.rockspec
 
 before_test:
 # install test only deps
-- call luarocks install telescope
+- luarocks install telescope
 
 test_script:
 - echo "Testing..."
 - cd %APPVEYOR_BUILD_FOLDER%\test
-- echo "Run your tests"
+- tsc test.lua
