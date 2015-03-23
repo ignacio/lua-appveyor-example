@@ -40,4 +40,4 @@ before_test:
 test_script:
 - echo "Testing..."
 - cd %APPVEYOR_BUILD_FOLDER%\test
-- tsc test.lua
+- tsc.bat test.lua
