@@ -16,26 +16,26 @@ environment:
   - LUA_VER: 5.1.5
     LUA_SHORTV: 5.1
 
-  - LUA_VER: 5.2.4
-    LUA_SHORTV: 5.2
+  # - LUA_VER: 5.2.4
+  #   LUA_SHORTV: 5.2
 
-  - LUA_VER: 5.3.0
-    LUA_SHORTV: 5.3
-
-
-init:
-# Make VS 2013 command line tools available
-- '"C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%'
+  # - LUA_VER: 5.3.0
+  #   LUA_SHORTV: 5.3
 
 install:
-- echo "Installing..."
-- cd %APPVEYOR_BUILD_FOLDER%
+# Setup Lua development/build environment
 - call .appveyor\install.bat
 
+before_build:
+# @todo
+- echo "Installing external deps"
+
 build_script:
-- echo "Building..."
-- cd %APPVEYOR_BUILD_FOLDER%
-- call .appveyor\build.bat
+- call luarocks make rockspecs/foo-scm-0.rockspec
+
+before_test:
+# install test only deps
+- call luarocks install telescope
 
 test_script:
 - echo "Testing..."
