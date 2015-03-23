@@ -7,9 +7,9 @@ This sample repository is intended as a sample of how to integrate your Lua proj
 
 This sample builds a matrix with Lua 5.1, 5.2 and 5.3. That means that each time you commit some changes, three jobs will be queued, so your code will be run using each of those Lua versions.
 So, each job will do the following:
-* Installs the appropiate Lua version
-* Installs LuaRocks (2.2.1)
+* Installs the appropiate Lua version (using [luawinmake](https://github.com/Tieske/luawinmake))
+* Installs [LuaRocks](https://rocks.moonscript.org/) (2.2.1)
 * Builds and installs a sample Lua module containing C and Lua parts
-* Runs tests
+* Runs tests using [Telescope](https://github.com/norman/telescope)
 
 This sample is based on Alexey Melnichuk's [lua-travis-example](https://github.com/moteus/lua-travis-example).
