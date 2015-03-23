@@ -1,5 +1,8 @@
 cd %APPVEYOR_BUILD_FOLDER%
 
+:: Make VS 2013 command line tools available
+call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%
+
 :: Download and compile Lua
 appveyor DownloadFile %LUAURL%/lua-%LUA_VER%.tar.gz
 7z x lua-%LUA_VER%.tar.gz
@@ -28,5 +31,4 @@ set LUA_PATH=%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\lua\?.lua;%ProgramFi
 set LUA_CPATH=%ProgramFiles(x86)%\LuaRocks\systree\lib\lua\%LUA_SHORTV%\?.dll
 call luarocks --version
 
-:: Install telescope, but you can pick any other test library
-call luarocks install telescope
+cd %APPVEYOR_BUILD_FOLDER%
