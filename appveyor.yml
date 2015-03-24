@@ -14,7 +14,6 @@ environment:
 
   #LUA: the Lua interpreter. either Lua or LuaJIT
 
-  DOWNLOADER: appveyor DownloadFile
   SEVENZIP: 7z
 
   matrix:

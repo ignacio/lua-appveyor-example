@@ -57,7 +57,9 @@ if "%LUA%"=="luajit" (
 	move !lj_source_folder!\src\luajit.exe !lj_dest_folder!\bin
 	move !lj_source_folder!\src\lua51.dll !lj_dest_folder!\bin
 	move !lj_source_folder!\src\lua51.lib !lj_dest_folder!\lib
-	for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do ( copy "!lj_source_folder!\src\%%a" "!lj_dest_folder!\include" )
+	for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
+		copy "!lj_source_folder!\src\%%a" "!lj_dest_folder!\include"
+	)
 
 	set LUA_DIR=!lj_dest_folder!
 ) else (
@@ -83,8 +85,6 @@ call :extract_zip downloads\luarocks-%LUAROCKS_VER%-win32.zip downloads\luarocks
 cd downloads\luarocks-%LUAROCKS_VER%-win32
 call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% || call :die
 set PATH=%PATH%;%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\;%ProgramFiles(x86)%\LuaRocks\systree\bin
-rem set LUA_PATH=%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\lua\?.lua;%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\lua\?\init.lua;%ProgramFiles(x86)%\LuaRocks\systree\share\lua\%LUA_SHORTV%\?.lua;%ProgramFiles(x86)%\LuaRocks\systree\share\lua\%LUA_SHORTV%\?\init.lua
-rem set LUA_CPATH=%ProgramFiles(x86)%\LuaRocks\systree\lib\lua\%LUA_SHORTV%\?.dll
 call luarocks --version || call :die
 
 :: Hack. Create a script that will set all the variables we want to set in the environment.
@@ -96,6 +96,27 @@ endlocal
 
 goto :eof
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:: This blank space is intentional. If you see errors like "The system cannot find the batch label specified 'foo'"
+:: then try adding or removing blank lines lines above.
+:: Yes, really.
+:: http://stackoverflow.com/questions/232651/why-the-system-cannot-find-the-batch-label-specified-is-thrown-even-if-label-e
 
 :: helper functions:
 
@@ -178,3 +199,4 @@ goto :eof
 echo Something went wrong ... Sorry!
 exit 1
 goto :eof
+
