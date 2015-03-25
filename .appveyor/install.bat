@@ -1,98 +1,138 @@
 @echo off
 Setlocal EnableDelayedExpansion
 
-:: Most of the following CMD scripting magic was taken from
-:: https://github.com/siffiejoe/prg-lr4win
-:: Thanks to siffiejoe
-
 cd %APPVEYOR_BUILD_FOLDER%
-
-:: hack to make sure that we can bail out from within nested
-:: subroutines without killing the console window
-:: Note: This hack prevents me from setting environment variables here to be visible in the calling script.
-:: That's why we resort to calling a temp file.
-:: I hate batch files.
-if "%~1" EQU "_GO_" (shift /1 & goto :main)
-cmd /c ^""%~f0" _GO_ %*^"
-if exist %APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat (
-	endlocal
-	call %APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat
-	del %APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat
-)
-exit /B
-
-:: start of the script
-:main
 
 :: first create some necessary directories:
 mkdir downloads 2>NUL
 
 :: Download and compile Lua (or LuaJIT)
 if "%LUA%"=="luajit" (
-	set lj_dest_folder=c:\lj%LJ_SHORTV%
+	:: defines LUA_DIR so Cmake can find this LuaJIT install
+	set LUA_DIR=c:\lj%LJ_SHORTV%
 	
-	if !LJ_SHORTV!==2.1 (
-		rem set lj_source_folder=c:\luajit-%LJ_VER%
-		set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
-		if not exist !lj_source_folder! (
-			git clone http://luajit.org/git/luajit-2.0.git !lj_source_folder! || call :die
+	if not exist !LUA_DIR! (
+		if !LJ_SHORTV!==2.1 (
+			:: Clone repository and checkout 2.1 branch
+			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
+			if not exist !lj_source_folder! (
+				git clone http://luajit.org/git/luajit-2.0.git !lj_source_folder! || call :die "Failed to clone repository"
+			)
+			cd !lj_source_folder!\src
+			git checkout v2.1 || call :die
+		) else (
+			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
+			if not exist !lj_source_folder! (
+				curl --silent --fail --max-time 120 --connect-timeout 30 http://luajit.org/download/LuaJIT-%LJ_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
+			)
+			cd !lj_source_folder!\src
 		)
-		cd !lj_source_folder!\src
-		git checkout v2.1 || call :die
+		:: Compiles LuaJIT
+		call msvcbuild.bat
+
+		mkdir !LUA_DIR! 2> NUL
+		for %%a in (bin include lib) do ( mkdir "!LUA_DIR!\%%a" )
+
+		for %%a in (luajit.exe lua51.dll) do ( move "!lj_source_folder!\src\%%a" "!LUA_DIR!\bin" )
+
+		move "!lj_source_folder!\src\lua51.lib" "!LUA_DIR!\lib"
+		for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
+			copy "!lj_source_folder!\src\%%a" "!LUA_DIR!\include"
+		)
+
 	) else (
-		call :download http://luajit.org/download/LuaJIT-%LJ_VER%.zip
-		call :extract_zip downloads\LuaJIT-%LJ_VER%.zip downloads\luajit-%LJ_VER%
-		set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
-		cd !lj_source_folder!\src
-	)
-	call msvcbuild.bat
-
-	if not exist !lj_dest_folder! (
-		mkdir !lj_dest_folder!
-		mkdir !lj_dest_folder!\bin
-		mkdir !lj_dest_folder!\include
-		mkdir !lj_dest_folder!\lib
+		echo LuaJIT %LJ_VER% already installed at !LUA_DIR!
 	)
 
-	move !lj_source_folder!\src\luajit.exe !lj_dest_folder!\bin
-	move !lj_source_folder!\src\lua51.dll !lj_dest_folder!\bin
-	move !lj_source_folder!\src\lua51.lib !lj_dest_folder!\lib
-	for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
-		copy "!lj_source_folder!\src\%%a" "!lj_dest_folder!\include"
-	)
-
-	set LUA_DIR=!lj_dest_folder!
 ) else (
-	call :download_lua %LUA_VER%
-	call :download https://github.com/Tieske/luawinmake/archive/master.zip
-	call :extract_zip downloads/master.zip downloads\lua-%LUA_VER%
-	if not exist downloads\lua-%LUA_VER%\etc mkdir downloads\lua-%LUA_VER%\etc
-	move downloads\luawinmake-master\etc\winmake.bat %APPVEYOR_BUILD_FOLDER%\downloads\lua-%LUA_VER%\etc\winmake.bat
-	cd downloads\lua-%LUA_VER%
-	call etc\winmake
-	call etc\winmake install c:\lua%LUA_VER%
+	:: defines LUA_DIR so Cmake can find this Lua install
 	set LUA_DIR=c:\lua%LUA_VER%
+
+	if not exist !LUA_DIR! (
+		:: Download and compile Lua
+		if not exist downloads\lua-%LUA_VER% (
+			curl --silent --fail --max-time 120 --connect-timeout 30 http://www.lua.org/ftp/lua-%LUA_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
+		)
+		
+		mkdir downloads\lua-%LUA_VER%\etc 2> NUL
+		if not exist downloads\lua-%LUA_VER%\etc\winmake.bat (
+			curl --silent --location --insecure --fail --max-time 120 --connect-timeout 30 https://github.com/Tieske/luawinmake/archive/master.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% e -si -ttar -aoa -odownloads\lua-%LUA_VER%\etc luawinmake-master\etc\winmake.bat
+		)
+
+		cd downloads\lua-%LUA_VER%
+		call etc\winmake
+		call etc\winmake install c:\lua%LUA_VER%
+	) else (
+		echo Lua %LUA_VER% already installed at !LUA_DIR!
+	)
 )
 
-:: defines LUA_DIR so Cmake can find this Lua install
-set PATH=!PATH!;!LUA_DIR!\bin
+if not exist !LUA_DIR!\bin\%LUA%.exe (
+	echo Missing Lua interpreter
+	exit /B 1
+)
+
+set PATH=%LUA_DIR%\bin;%PATH%
 call !LUA! -v
 
-:: Downloads and installs LuaRocks
-cd %APPVEYOR_BUILD_FOLDER%
-call :download %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
-call :extract_zip downloads\luarocks-%LUAROCKS_VER%-win32.zip downloads\luarocks-%LUAROCKS_VER%-win32
-cd downloads\luarocks-%LUAROCKS_VER%-win32
-call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% || call :die
-set PATH=%PATH%;%ProgramFiles(x86)%\LuaRocks\%LUAROCKS_SHORTV%\;%ProgramFiles(x86)%\LuaRocks\systree\bin
-call luarocks --version || call :die
 
-:: Hack. Create a script that will set all the variables we want to set in the environment.
-ECHO set PATH=%PATH%>> "%APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat"
-ECHO set LUA_DIR=%LUA_DIR%>> "%APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat"
-call luarocks path>> "%APPVEYOR_BUILD_FOLDER%\.appveyor\setpaths.bat"
+:: =========================================================
+:: Set some defaults
+if "%LR_EXTERNAL%"=="" set LR_EXTERNAL=c:\external
+if "%LUAROCKS_INSTALL%"=="" set LUAROCKS_INSTALL=%ProgramFiles(x86)%\LuaRocks
+if "%LR_ROOT%"=="" set LR_ROOT=%LUAROCKS_INSTALL%\%LUAROCKS_SHORTV%
+if "%LR_SYSTREE%"=="" set LR_SYSTREE=%LUAROCKS_INSTALL%\systree
+if /I "%platform%"=="x64" set LR_SYSTREE=%ProgramFiles%\LuaRocks\systree
+:: =========================================================
 
-endlocal
+
+if not exist "%LR_ROOT%" (
+	:: Downloads and installs LuaRocks
+	cd %APPVEYOR_BUILD_FOLDER%
+
+	if not exist downloads\luarocks-%LUAROCKS_VER%-win32.zip (
+		echo Downloading LuaRocks... 
+		curl --silent --fail --max-time 120 --connect-timeout 30 --output downloads\luarocks-%LUAROCKS_VER%-win32.zip %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
+		%SEVENZIP% x -aoa -odownloads downloads\luarocks-%LUAROCKS_VER%-win32.zip
+	)
+
+	cd downloads\luarocks-%LUAROCKS_VER%-win32
+	call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%"
+)
+
+if not exist "%LR_ROOT%" (
+	echo LuaRocks installation failed.
+	exit /B 2
+)
+
+set PATH=%LR_ROOT%;%LR_SYSTREE%\bin;%PATH%
+
+:: Lua will use just the system rocks
+set LUA_PATH=%LR_ROOT%\lua\?.lua;%LR_ROOT%\lua\?\init.lua
+set LUA_PATH=%LUA_PATH%;%LR_SYSTREE%\share\lua\%LUA_SHORTV%\?.lua
+set LUA_PATH=%LUA_PATH%;%LR_SYSTREE%\share\lua\%LUA_SHORTV%\?\init.lua
+set LUA_CPATH=%LR_SYSTREE%\lib\lua\%LUA_SHORTV%\?.dll
+
+call luarocks --version || call :die "Error with LuaRocks installation"
+call luarocks list
+
+
+if not exist "%LR_EXTERNAL%" (
+	mkdir "%LR_EXTERNAL%"
+	mkdir "%LR_EXTERNAL%\lib"
+	mkdir "%LR_EXTERNAL%\include"
+)
+
+set PATH=%LR_EXTERNAL%;%PATH%
+
+echo ======================================================
+echo Install Lua %LUA_VER% and LuaRocks %LUAROCKS_VER% done
+echo Platform - %platform%
+echo LUA_PATH  - %LUA_PATH%
+echo LUA_CPATH - %LUA_CPATH%
+echo ======================================================
+
+endlocal & set PATH=%PATH%& set LUA_DIR=%LUA_DIR%& set LR_SYSTREE=%LR_SYSTREE%& set LUA_PATH=%LUA_PATH%& set LUA_CPATH=%LUA_CPATH%
 
 goto :eof
 
@@ -120,83 +160,9 @@ goto :eof
 
 :: helper functions:
 
-:: strip the last extension from a file name
-:strip_ext
-setlocal
-for /F "delims=" %%G in ("%~1") do set _result=%%~nG
-endlocal & set _result=%_result%
-goto :eof
-
-:: get the filename part of an internet URL (using forward slashes)
-:url_basename
-setlocal
-set _var=%1
-:url_basename_loop
-set _result=%_var:*/=%
-if %_result% NEQ %_var% (
-  set _var=%_result%
-  goto :url_basename_loop
-)
-endlocal & set _result=%_result%
-goto :eof
-
-
-:: download a file from the internet using wget
-:download
-setlocal
-set _url=%1
-call :url_basename %_url%
-set _dest_file=%_result%
-if NOT exist downloads\%_dest_file% (
-	echo Downloading %_url% ...
-	if NOT [%APPVEYOR%]==[] (
-		appveyor DownloadFile %_url% -FileName downloads\%_dest_file%
-	) else (
-		"%WGET%" --no-check-certificate -nc -P downloads %_url% -O downloads\%_dest_file% || call :die
-	)
-)
-endlocal & set _result=downloads\%_dest_file%
-goto :eof
-
-
-:: extract a tarball
-:extract_tarball
-setlocal
-set _tarball=%1
-set _dir=%2
-call :strip_ext %_tarball%
-echo Extracting %_tarball% ...
-"%SEVENZIP%" x -aoa -odownloads %_tarball% || call :die
-"%SEVENZIP%" x -aoa -o%_dir% downloads\%_result% || call :die
-endlocal
-goto :eof
-
-:: extract a zip
-:extract_zip
-setlocal
-set _zipfile=%1
-set _dir=%2
-call :strip_ext %_zipfile%
-echo Extracting %_zipfile% ...
-"%SEVENZIP%" x -aoa -odownloads %_zipfile% || call :die
-endlocal
-goto :eof
-
-:: download a Lua tarball and extract it
-:download_lua
-setlocal
-set _ver=%1
-call :download %LUAURL%/lua-%_ver%.tar.gz
-call :extract_tarball %_result% %APPVEYOR_BUILD_FOLDER%\downloads
-set _dir=downloads\lua-%_ver%
-endlocal & set _result=0
-goto :eof
-
-
-
 :: for bailing out when an error occurred
-:die
-echo Something went wrong ... Sorry!
+:die %1
+echo %1
 exit 1
 goto :eof
 
