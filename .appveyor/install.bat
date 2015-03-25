@@ -1,7 +1,38 @@
 @echo off
-Setlocal EnableDelayedExpansion
+Setlocal EnableDelayedExpansion EnableExtensions
 
 cd %APPVEYOR_BUILD_FOLDER%
+
+:: =========================================================
+:: Set some defaults. Infer some variables.
+::
+if "%LUA_VER%" NEQ "" (
+	set LUA=lua
+	set LUA_SHORTV=%LUA_VER:~0,3%
+) else (
+	set LUA=luajit
+	set LJ_SHORTV=%LJ_VER:~0,3%
+	set LUA_SHORTV=5.1
+)
+
+set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
+
+if not defined LUAROCKS_URL set LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases
+if not defined LUAROCKS_REPO set LUAROCKS_REPO=http://rocks.moonscript.org
+if not defined LUA_URL set LUA_URL=http://www.lua.org/ftp
+if not defined LUAJIT_GIT_REPO set LUAJIT_GIT_REPO=http://luajit.org/git/luajit-2.0.git
+if not defined LUAJIT_URL set LUAJIT_URL=http://luajit.org/download
+
+if not defined LR_EXTERNAL set LR_EXTERNAL=c:\external
+if not defined LUAROCKS_INSTALL set LUAROCKS_INSTALL=%ProgramFiles(x86)%\LuaRocks
+if not defined LR_ROOT set LR_ROOT=%LUAROCKS_INSTALL%\%LUAROCKS_SHORTV%
+if not defined LR_SYSTREE set LR_SYSTREE=%LUAROCKS_INSTALL%\systree
+if /I "%platform%"=="x64" set LR_SYSTREE=%ProgramFiles%\LuaRocks\systree
+
+if not defined SEVENZIP set SEVENZIP=7z
+
+::
+:: =========================================================
 
 :: first create some necessary directories:
 mkdir downloads 2>NUL
@@ -10,20 +41,22 @@ mkdir downloads 2>NUL
 if "%LUA%"=="luajit" (
 	:: defines LUA_DIR so Cmake can find this LuaJIT install
 	set LUA_DIR=c:\lj%LJ_SHORTV%
-	
+
 	if not exist !LUA_DIR! (
 		if !LJ_SHORTV!==2.1 (
 			:: Clone repository and checkout 2.1 branch
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
-				git clone http://luajit.org/git/luajit-2.0.git !lj_source_folder! || call :die "Failed to clone repository"
+				echo Cloning git repo %LUAJIT_GIT_REPO% !lj_source_folder!
+				git clone %LUAJIT_GIT_REPO% !lj_source_folder! || call :die "Failed to clone repository"
 			)
 			cd !lj_source_folder!\src
 			git checkout v2.1 || call :die
 		) else (
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
-				curl --silent --fail --max-time 120 --connect-timeout 30 http://luajit.org/download/LuaJIT-%LJ_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
+				echo Downloading... %LUAJIT_URL%/LuaJIT-%LJ_VER%.tar.gz
+				curl --silent --fail --max-time 120 --connect-timeout 30 %LUAJIT_URL%/LuaJIT-%LJ_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
 			)
 			cd !lj_source_folder!\src
 		)
@@ -51,7 +84,7 @@ if "%LUA%"=="luajit" (
 	if not exist !LUA_DIR! (
 		:: Download and compile Lua
 		if not exist downloads\lua-%LUA_VER% (
-			curl --silent --fail --max-time 120 --connect-timeout 30 http://www.lua.org/ftp/lua-%LUA_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
+			curl --silent --fail --max-time 120 --connect-timeout 30 %LUA_URL%/lua-%LUA_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
 		)
 		
 		mkdir downloads\lua-%LUA_VER%\etc 2> NUL
@@ -76,15 +109,10 @@ set PATH=%LUA_DIR%\bin;%PATH%
 call !LUA! -v
 
 
-:: =========================================================
-:: Set some defaults
-if "%LR_EXTERNAL%"=="" set LR_EXTERNAL=c:\external
-if "%LUAROCKS_INSTALL%"=="" set LUAROCKS_INSTALL=%ProgramFiles(x86)%\LuaRocks
-if "%LR_ROOT%"=="" set LR_ROOT=%LUAROCKS_INSTALL%\%LUAROCKS_SHORTV%
-if "%LR_SYSTREE%"=="" set LR_SYSTREE=%LUAROCKS_INSTALL%\systree
-if /I "%platform%"=="x64" set LR_SYSTREE=%ProgramFiles%\LuaRocks\systree
-:: =========================================================
 
+:: =========================================================
+:: LuaRocks
+:: =========================================================
 
 if not exist "%LR_ROOT%" (
 	:: Downloads and installs LuaRocks
@@ -126,7 +154,11 @@ if not exist "%LR_EXTERNAL%" (
 set PATH=%LR_EXTERNAL%;%PATH%
 
 echo ======================================================
-echo Install Lua %LUA_VER% and LuaRocks %LUAROCKS_VER% done
+if "%LUA%"=="luajit" (
+	echo Installation of LuaJIT %LJ_VER% and LuaRocks %LUAROCKS_VER% done.
+) else (
+	echo Installation of Lua %LUA_VER% and LuaRocks %LUAROCKS_VER% done.
+)
 echo Platform - %platform%
 echo LUA_PATH  - %LUA_PATH%
 echo LUA_CPATH - %LUA_CPATH%

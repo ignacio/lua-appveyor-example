@@ -6,46 +6,16 @@ os:
 shallow_clone: true
 
 environment:
-  LUAURL: http://www.lua.org/ftp
-  LUAROCKS_URL: http://keplerproject.github.io/luarocks/releases
-  LUAROCKS_REPO: http://rocks.moonscript.org
   LUAROCKS_VER: 2.2.1
-  LUAROCKS_SHORTV: 2.2
 
-  # if you need to install luarocks to a different directory
-  # If you change this, update 'cache' entry
-  LUAROCKS_INSTALL: C:\Program Files (x86)\LuaRocks
-
-  # External dependencies
-  LR_EXTERNAL: c:\external
-
-
-  #LUA: the Lua interpreter. either Lua or LuaJIT
-
-  SEVENZIP: 7z
+  # if you need to install luarocks to a different directory, define LUAROCKS_INSTALL and update the 'cache' entry.
 
   matrix:
   - LUA_VER: 5.1.5
-    LUA_SHORTV: 5.1
-    LUA: lua
-
   - LUA_VER: 5.2.4
-    LUA_SHORTV: 5.2
-    LUA: lua
-
   - LUA_VER: 5.3.0
-    LUA_SHORTV: 5.3
-    LUA: lua
-
   - LJ_VER: 2.0.3
-    LUA_SHORTV: 5.1
-    LJ_SHORTV: 2.0
-    LUA: luajit
-
   - LJ_VER: 2.1
-    LUA_SHORTV: 5.1
-    LJ_SHORTV: 2.1
-    LUA: luajit
 
 platform:
   - x86
