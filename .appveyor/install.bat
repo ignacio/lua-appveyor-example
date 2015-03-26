@@ -1,11 +1,11 @@
 @echo off
-Setlocal EnableDelayedExpansion EnableExtensions
 
 cd %APPVEYOR_BUILD_FOLDER%
 
 :: =========================================================
 :: Set some defaults. Infer some variables.
 ::
+:: These are set globally
 if "%LUA_VER%" NEQ "" (
 	set LUA=lua
 	set LUA_SHORTV=%LUA_VER:~0,3%
@@ -14,6 +14,9 @@ if "%LUA_VER%" NEQ "" (
 	set LJ_SHORTV=%LJ_VER:~0,3%
 	set LUA_SHORTV=5.1
 )
+
+:: Now we declare a scope
+Setlocal EnableDelayedExpansion EnableExtensions
 
 set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
 
@@ -160,8 +163,7 @@ set LUA_DIR=%LUA_DIR%&^
 set LR_SYSTREE=%LR_SYSTREE%&^
 set LUA_PATH=%LUA_PATH%&^
 set LUA_CPATH=%LUA_CPATH%&^
-set LR_EXTERNAL=%LR_EXTERNAL%&^
-set LUA=%LUA%
+set LR_EXTERNAL=%LR_EXTERNAL%
 
 echo ======================================================
 if "%LUA%"=="luajit" (
@@ -169,9 +171,14 @@ if "%LUA%"=="luajit" (
 ) else (
 	echo Installation of Lua %LUA_VER% and LuaRocks %LUAROCKS_VER% done.
 )
-echo Platform - %platform%
-echo LUA_PATH  - %LUA_PATH%
-echo LUA_CPATH - %LUA_CPATH%
+echo Platform         - %platform%
+echo LUA              - %LUA%
+echo LUA_SHORTV       - %LUA_SHORTV%
+echo LJ_SHORTV        - %LJ_SHORTV%
+echo LUA_PATH         - %LUA_PATH%
+echo LUA_CPATH        - %LUA_CPATH%
+echo
+echo LR_EXTERNAL      - %LR_EXTERNAL%
 echo ======================================================
 
 goto :eof
