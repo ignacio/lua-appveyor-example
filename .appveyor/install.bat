@@ -164,7 +164,16 @@ echo LUA_PATH  - %LUA_PATH%
 echo LUA_CPATH - %LUA_CPATH%
 echo ======================================================
 
-endlocal & set PATH=%PATH%& set LUA_DIR=%LUA_DIR%& set LR_SYSTREE=%LR_SYSTREE%& set LUA_PATH=%LUA_PATH%& set LUA_CPATH=%LUA_CPATH%
+:: Exports the following variables:
+:: (beware of whitespace between & and ^ below) 
+endlocal & ^
+set PATH=%PATH%& ^ 
+set LUA_DIR=%LUA_DIR%& ^
+set LR_SYSTREE=%LR_SYSTREE%& ^
+set LUA_PATH=%LUA_PATH%& ^
+set LUA_CPATH=%LUA_CPATH%& ^
+set LR_EXTERNAL=%LR_EXTERNAL%& ^
+set LUA=%LUA%
 
 goto :eof
 
