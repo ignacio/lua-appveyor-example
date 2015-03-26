@@ -153,6 +153,16 @@ if not exist "%LR_EXTERNAL%" (
 
 set PATH=%LR_EXTERNAL%;%PATH%
 
+:: Exports the following variables:
+:: (beware of whitespace between & and ^ below)
+endlocal & set PATH=%PATH%&^
+set LUA_DIR=%LUA_DIR%&^
+set LR_SYSTREE=%LR_SYSTREE%&^
+set LUA_PATH=%LUA_PATH%&^
+set LUA_CPATH=%LUA_CPATH%&^
+set LR_EXTERNAL=%LR_EXTERNAL%&^
+set LUA=%LUA%
+
 echo ======================================================
 if "%LUA%"=="luajit" (
 	echo Installation of LuaJIT %LJ_VER% and LuaRocks %LUAROCKS_VER% done.
@@ -163,17 +173,6 @@ echo Platform - %platform%
 echo LUA_PATH  - %LUA_PATH%
 echo LUA_CPATH - %LUA_CPATH%
 echo ======================================================
-
-:: Exports the following variables:
-:: (beware of whitespace between & and ^ below) 
-endlocal & ^
-set PATH=%PATH%& ^ 
-set LUA_DIR=%LUA_DIR%& ^
-set LR_SYSTREE=%LR_SYSTREE%& ^
-set LUA_PATH=%LUA_PATH%& ^
-set LUA_CPATH=%LUA_CPATH%& ^
-set LR_EXTERNAL=%LR_EXTERNAL%& ^
-set LUA=%LUA%
 
 goto :eof
 
