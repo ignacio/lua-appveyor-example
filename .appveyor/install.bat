@@ -40,13 +40,17 @@ if not defined SEVENZIP set SEVENZIP=7z
 :: first create some necessary directories:
 mkdir downloads 2>NUL
 
+:: defines LUA_DIR so Cmake can find this Lua install
+if "%LUA%"=="luajit" (
+	set LUA_DIR=c:\lua\lj%LJ_SHORTV%
+) else (
+	set LUA_DIR=c:\lua\%LUA_VER%
+)
+
 :: Download and compile Lua (or LuaJIT)
 if "%LUA%"=="luajit" (
-	:: defines LUA_DIR so Cmake can find this LuaJIT install
-	set LUA_DIR=c:\lj%LJ_SHORTV%
-
-	if not exist !LUA_DIR! (
-		if !LJ_SHORTV!==2.1 (
+	if not exist %LUA_DIR% (
+		if "%LJ_SHORTV%"=="2.1" (
 			:: Clone repository and checkout 2.1 branch
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
@@ -66,25 +70,21 @@ if "%LUA%"=="luajit" (
 		:: Compiles LuaJIT
 		call msvcbuild.bat
 
-		mkdir !LUA_DIR! 2> NUL
-		for %%a in (bin include lib) do ( mkdir "!LUA_DIR!\%%a" )
+		mkdir %LUA_DIR% 2> NUL
+		for %%a in (bin include lib) do ( mkdir "%LUA_DIR%\%%a" )
 
-		for %%a in (luajit.exe lua51.dll) do ( move "!lj_source_folder!\src\%%a" "!LUA_DIR!\bin" )
+		for %%a in (luajit.exe lua51.dll) do ( move "!lj_source_folder!\src\%%a" "%LUA_DIR%\bin" )
 
-		move "!lj_source_folder!\src\lua51.lib" "!LUA_DIR!\lib"
+		move "!lj_source_folder!\src\lua51.lib" "%LUA_DIR%\lib"
 		for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
-			copy "!lj_source_folder!\src\%%a" "!LUA_DIR!\include"
+			copy "!lj_source_folder!\src\%%a" "%LUA_DIR%\include"
 		)
 
 	) else (
-		echo LuaJIT %LJ_VER% already installed at !LUA_DIR!
+		echo LuaJIT %LJ_VER% already installed at %LUA_DIR%
 	)
-
 ) else (
-	:: defines LUA_DIR so Cmake can find this Lua install
-	set LUA_DIR=c:\lua%LUA_VER%
-
-	if not exist !LUA_DIR! (
+	if not exist %LUA_DIR% (
 		:: Download and compile Lua
 		if not exist downloads\lua-%LUA_VER% (
 			curl --silent --fail --max-time 120 --connect-timeout 30 %LUA_URL%/lua-%LUA_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
@@ -97,13 +97,13 @@ if "%LUA%"=="luajit" (
 
 		cd downloads\lua-%LUA_VER%
 		call etc\winmake
-		call etc\winmake install c:\lua%LUA_VER%
+		call etc\winmake install %LUA_DIR%
 	) else (
-		echo Lua %LUA_VER% already installed at !LUA_DIR!
+		echo Lua %LUA_VER% already installed at %LUA_DIR%
 	)
 )
 
-if not exist !LUA_DIR!\bin\%LUA%.exe (
+if not exist %LUA_DIR%\bin\%LUA%.exe (
 	echo Missing Lua interpreter
 	exit /B 1
 )
