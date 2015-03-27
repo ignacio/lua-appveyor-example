@@ -15,6 +15,13 @@ if "%LUA_VER%" NEQ "" (
 	set LUA_SHORTV=5.1
 )
 
+:: defines LUA_DIR so Cmake can find this Lua install
+if "%LUA%"=="luajit" (
+	set LUA_DIR=c:\lua\%platform%\lj%LJ_SHORTV%
+) else (
+	set LUA_DIR=c:\lua\%platform%\%LUA_VER%
+)
+
 :: Now we declare a scope
 Setlocal EnableDelayedExpansion EnableExtensions
 
@@ -27,25 +34,16 @@ if not defined LUAJIT_GIT_REPO set LUAJIT_GIT_REPO=http://luajit.org/git/luajit-
 if not defined LUAJIT_URL set LUAJIT_URL=http://luajit.org/download
 
 if not defined LR_EXTERNAL set LR_EXTERNAL=c:\external
-if not defined LUAROCKS_INSTALL set LUAROCKS_INSTALL=%ProgramFiles(x86)%\LuaRocks
+if not defined LUAROCKS_INSTALL set LUAROCKS_INSTALL=%LUA_DIR%\LuaRocks
 if not defined LR_ROOT set LR_ROOT=%LUAROCKS_INSTALL%\%LUAROCKS_SHORTV%
 if not defined LR_SYSTREE set LR_SYSTREE=%LUAROCKS_INSTALL%\systree
-if /I "%platform%"=="x64" set LR_SYSTREE=%ProgramFiles%\LuaRocks\systree
 
 if not defined SEVENZIP set SEVENZIP=7z
-
 ::
 :: =========================================================
 
 :: first create some necessary directories:
 mkdir downloads 2>NUL
-
-:: defines LUA_DIR so Cmake can find this Lua install
-if "%LUA%"=="luajit" (
-	set LUA_DIR=c:\lua\lj%LJ_SHORTV%
-) else (
-	set LUA_DIR=c:\lua\%LUA_VER%
-)
 
 :: Download and compile Lua (or LuaJIT)
 if "%LUA%"=="luajit" (
@@ -103,10 +101,7 @@ if "%LUA%"=="luajit" (
 	)
 )
 
-if not exist %LUA_DIR%\bin\%LUA%.exe (
-	echo Missing Lua interpreter
-	exit /B 1
-)
+if not exist %LUA_DIR%\bin\%LUA%.exe call :die "Missing Lua interpreter at %LUA_DIR%\bin\%LUA%.exe"
 
 set PATH=%LUA_DIR%\bin;%PATH%
 call !LUA! -v
@@ -128,13 +123,10 @@ if not exist "%LR_ROOT%" (
 	)
 
 	cd downloads\luarocks-%LUAROCKS_VER%-win32
-	call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%"
+	call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%" /TREE "%LR_SYSTREE%"
 )
 
-if not exist "%LR_ROOT%" (
-	echo LuaRocks installation failed.
-	exit /B 2
-)
+if not exist "%LR_ROOT%" call :die "LuaRocks not found at %LR_ROOT%"
 
 set PATH=%LR_ROOT%;%LR_SYSTREE%\bin;%PATH%
 
@@ -159,12 +151,12 @@ set PATH=%LR_EXTERNAL%;%PATH%
 :: Exports the following variables:
 :: (beware of whitespace between & and ^ below)
 endlocal & set PATH=%PATH%&^
-set LUA_DIR=%LUA_DIR%&^
 set LR_SYSTREE=%LR_SYSTREE%&^
 set LUA_PATH=%LUA_PATH%&^
 set LUA_CPATH=%LUA_CPATH%&^
 set LR_EXTERNAL=%LR_EXTERNAL%
 
+echo.
 echo ======================================================
 if "%LUA%"=="luajit" (
 	echo Installation of LuaJIT %LJ_VER% and LuaRocks %LUAROCKS_VER% done.
@@ -177,9 +169,10 @@ echo LUA_SHORTV       - %LUA_SHORTV%
 echo LJ_SHORTV        - %LJ_SHORTV%
 echo LUA_PATH         - %LUA_PATH%
 echo LUA_CPATH        - %LUA_CPATH%
-echo
+echo.
 echo LR_EXTERNAL      - %LR_EXTERNAL%
 echo ======================================================
+echo.
 
 goto :eof
 
@@ -210,6 +203,6 @@ goto :eof
 :: for bailing out when an error occurred
 :die %1
 echo %1
-exit 1
+exit /B 1
 goto :eof
 

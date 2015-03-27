@@ -21,8 +21,6 @@ platform:
 cache:
   - c:\lua -> appveyor.yml
   - c:\external -> appveyor.yml
-  - C:\Program Files (x86)\LuaRocks -> appveyor.yml
-  - C:\Program Files\LuaRocks -> appveyor.yml
 
 init:
 # Setup Lua development/build environment
