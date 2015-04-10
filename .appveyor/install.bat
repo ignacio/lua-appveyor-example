@@ -30,6 +30,11 @@ set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
 if not defined LUAROCKS_URL set LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases
 if not defined LUAROCKS_REPO set LUAROCKS_REPO=http://rocks.moonscript.org
 if not defined LUA_URL set LUA_URL=http://www.lua.org/ftp
+if defined NOCOMPAT (
+	set COMPATFLAG=--nocompat
+) else (
+	set COMPATFLAG=
+)
 if not defined LUAJIT_GIT_REPO set LUAJIT_GIT_REPO=http://luajit.org/git/luajit-2.0.git
 if not defined LUAJIT_URL set LUAJIT_URL=http://luajit.org/download
 
@@ -94,7 +99,7 @@ if "%LUA%"=="luajit" (
 		)
 
 		cd downloads\lua-%LUA_VER%
-		call etc\winmake
+		call etc\winmake %COMPATFLAG%
 		call etc\winmake install %LUA_DIR%
 	) else (
 		echo Lua %LUA_VER% already installed at %LUA_DIR%
@@ -162,6 +167,7 @@ if "%LUA%"=="luajit" (
 	echo Installation of LuaJIT %LJ_VER% and LuaRocks %LUAROCKS_VER% done.
 ) else (
 	echo Installation of Lua %LUA_VER% and LuaRocks %LUAROCKS_VER% done.
+	if defined NOCOMPAT echo Lua was built with compatibility flags disabled.
 )
 echo Platform         - %platform%
 echo LUA              - %LUA%
