@@ -74,7 +74,7 @@ if "%LUA%"=="luajit" (
 		call msvcbuild.bat
 
 		mkdir %LUA_DIR% 2> NUL
-		for %%a in (bin include lib) do ( mkdir "%LUA_DIR%\%%a" )
+		for %%a in (bin bin\lua bin\lua\jit include lib) do ( mkdir "%LUA_DIR%\%%a" )
 
 		for %%a in (luajit.exe lua51.dll) do ( move "!lj_source_folder!\src\%%a" "%LUA_DIR%\bin" )
 
@@ -82,6 +82,8 @@ if "%LUA%"=="luajit" (
 		for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
 			copy "!lj_source_folder!\src\%%a" "%LUA_DIR%\include"
 		)
+		
+		copy "!lj_source_folder!\src\jit\*.lua" "%LUA_DIR%\bin\lua\jit"
 
 	) else (
 		echo LuaJIT %LJ_VER% already installed at %LUA_DIR%
