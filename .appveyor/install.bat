@@ -83,7 +83,7 @@ if "%LUA%"=="luajit" (
 		for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
 			copy "!lj_source_folder!\src\%%a" "%LUA_DIR%\include"
 		)
-		
+
 		copy "!lj_source_folder!\src\jit\*.lua" "%LUA_DIR%\bin\lua\jit"
 
 	) else (
@@ -95,7 +95,7 @@ if "%LUA%"=="luajit" (
 		if not exist downloads\lua-%LUA_VER% (
 			curl --silent --fail --max-time 120 --connect-timeout 30 %LUA_URL%/lua-%LUA_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
 		)
-		
+
 		mkdir downloads\lua-%LUA_VER%\etc 2> NUL
 		if not exist downloads\lua-%LUA_VER%\etc\winmake.bat (
 			curl --silent --location --insecure --fail --max-time 120 --connect-timeout 30 https://github.com/Tieske/luawinmake/archive/master.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% e -si -ttar -aoa -odownloads\lua-%LUA_VER%\etc luawinmake-master\etc\winmake.bat
@@ -125,7 +125,7 @@ if not exist "%LR_ROOT%" (
 	cd %APPVEYOR_BUILD_FOLDER%
 
 	if not exist downloads\luarocks-%LUAROCKS_VER%-win32.zip (
-		echo Downloading LuaRocks... 
+		echo Downloading LuaRocks...
 		curl --silent --fail --max-time 120 --connect-timeout 30 --output downloads\luarocks-%LUAROCKS_VER%-win32.zip %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
 		%SEVENZIP% x -aoa -odownloads downloads\luarocks-%LUAROCKS_VER%-win32.zip
 	)
