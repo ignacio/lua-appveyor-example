@@ -77,6 +77,7 @@ if "%LUA%"=="luajit" (
 		for %%a in (bin bin\lua bin\lua\jit include lib) do ( mkdir "%LUA_DIR%\%%a" )
 
 		for %%a in (luajit.exe lua51.dll) do ( move "!lj_source_folder!\src\%%a" "%LUA_DIR%\bin" )
+		copy "%LUA_DIR%\bin\luajit.exe" "%LUA_DIR%\bin\lua.exe"
 
 		move "!lj_source_folder!\src\lua51.lib" "%LUA_DIR%\lib"
 		for %%a in (lauxlib.h lua.h lua.hpp luaconf.h lualib.h luajit.h) do (
