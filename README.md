@@ -19,7 +19,7 @@ This sample is based on Alexey Melnichuk's [lua-travis-example](https://github.c
 By default, you can set a test matrix with different Lua and LuaJIT versions. Using the `LUA_VER` variable yo specify the full Lua version to use (i.e. 5.2.4).
 Using the `LJ_VER` variable, you specify the LuaJIT version to use (i.e. 2.0.3). LuaJIT 2.1 is special in that it is currently tracking the HEAD of its git repository.
 
-The following variables can also be overrdidden if necessary:
+The following variables can also be overridden if necessary:
 
 - LUAROCKS_URL: Where to download LuaRocks from (http://keplerproject.github.io/luarocks/releases)
 - LUAROCKS_REPO: Which LuaRocks repository to use (http://rocks.moonscript.org)
