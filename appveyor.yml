@@ -15,7 +15,7 @@ environment:
   - LUA_VER: 5.3.0
   - LUA_VER: 5.3.0
     NOCOMPAT: true
-  - LJ_VER: 2.0.3
+  - LJ_VER: 2.0.4
   - LJ_VER: 2.1
 
 platform:

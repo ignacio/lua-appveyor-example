@@ -28,7 +28,7 @@ Setlocal EnableDelayedExpansion EnableExtensions
 set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
 
 if not defined LUAROCKS_URL set LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases
-if not defined LUAROCKS_REPO set LUAROCKS_REPO=http://rocks.moonscript.org
+if not defined LUAROCKS_REPO set LUAROCKS_REPO=https://luarocks.org
 if not defined LUA_URL set LUA_URL=http://www.lua.org/ftp
 if defined NOCOMPAT (
 	set COMPATFLAG=--nocompat
