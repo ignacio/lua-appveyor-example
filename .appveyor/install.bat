@@ -25,7 +25,12 @@ if "%LUA%"=="luajit" (
 :: Now we declare a scope
 Setlocal EnableDelayedExpansion EnableExtensions
 
-set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
+if "%LUAROCKS_VER%" NEQ "HEAD" (
+	set LUAROCKS_SHORTV=%LUAROCKS_VER:~0,3%
+) else (
+	:: Assume 2.2 for the time being. TODO: fix this
+	set LUAROCKS_SHORTV=2.2
+)
 
 if not defined LUAROCKS_URL set LUAROCKS_URL=http://keplerproject.github.io/luarocks/releases
 if not defined LUAROCKS_REPO set LUAROCKS_REPO=https://luarocks.org
@@ -127,10 +132,20 @@ if not exist "%LR_ROOT%" (
 	:: Downloads and installs LuaRocks
 	cd %APPVEYOR_BUILD_FOLDER%
 
-	if not exist downloads\luarocks-%LUAROCKS_VER%-win32.zip (
-		echo Downloading LuaRocks...
-		curl --silent --fail --max-time 120 --connect-timeout 30 --output downloads\luarocks-%LUAROCKS_VER%-win32.zip %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
-		%SEVENZIP% x -aoa -odownloads downloads\luarocks-%LUAROCKS_VER%-win32.zip
+	if %LUAROCKS_VER%==HEAD (
+		set lr_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luarocks-%LUAROCKS_VER%-win32
+		if not exist !lr_source_folder! (
+			git clone https://github.com/keplerproject/luarocks.git --single-branch --depth 1 !lr_source_folder! || call :die "Failed to clone LuaRocks repository"
+		) else (
+			cd !lr_source_folder!
+			git pull || call :die "Failed to update LuaRocks repository"
+		)
+	) else (
+		if not exist downloads\luarocks-%LUAROCKS_VER%-win32.zip (
+			echo Downloading LuaRocks...
+			curl --silent --fail --max-time 120 --connect-timeout 30 --output downloads\luarocks-%LUAROCKS_VER%-win32.zip %LUAROCKS_URL%/luarocks-%LUAROCKS_VER%-win32.zip
+			%SEVENZIP% x -aoa -odownloads downloads\luarocks-%LUAROCKS_VER%-win32.zip
+		)
 	)
 
 	cd downloads\luarocks-%LUAROCKS_VER%-win32

@@ -23,6 +23,7 @@ The following variables can also be overridden if necessary:
 
 - LUAROCKS_URL: Where to download LuaRocks from (http://keplerproject.github.io/luarocks/releases)
 - LUAROCKS_REPO: Which LuaRocks repository to use (https://luarocks.org)
+- LUAROCKS_VER: Which LuaRocks version to use. If you define it to `HEAD`, the current sources at [LuaRocks repository](https://github.com/keplerproject/luarocks) will be used (the _master_ branch).
 - LUA_URL: Where to download Lua from (http://www.lua.org/ftp)
 - LUAJIT_GIT_REPO: Where is LuaJIT's git repository (http://luajit.org/git/luajit-2.0.git)
 - LUAJIT_URL: Where to download LuaJIT stable releases from (http://luajit.org/download)
