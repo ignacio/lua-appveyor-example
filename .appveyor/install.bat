@@ -59,6 +59,9 @@ if "%LUA%"=="luajit" (
 			if not exist !lj_source_folder! (
 				echo Cloning git repo %LUAJIT_GIT_REPO% !lj_source_folder!
 				git clone %LUAJIT_GIT_REPO% !lj_source_folder! || call :die "Failed to clone repository"
+			) else (
+				cd !lj_source_folder!
+				git pull || call :die "Failed to update repository"
 			)
 			cd !lj_source_folder!\src
 			git checkout v2.1 || call :die
