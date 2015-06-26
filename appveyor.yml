@@ -1,7 +1,8 @@
 version: 0.0.1.{build}-test
 
-os:
-- Windows Server 2012 R2
+# Use default image unless needed
+#os:
+#- Windows Server 2012 R2
 
 shallow_clone: true
 
