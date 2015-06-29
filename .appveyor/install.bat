@@ -105,9 +105,7 @@ if "%LUA%"=="luajit" (
 		)
 
 		mkdir downloads\lua-%LUA_VER%\etc 2> NUL
-		if not exist downloads\lua-%LUA_VER%\etc\winmake.bat (
-			curl --silent --location --insecure --fail --max-time 120 --connect-timeout 30 https://github.com/Tieske/luawinmake/archive/master.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% e -si -ttar -aoa -odownloads\lua-%LUA_VER%\etc luawinmake-master\etc\winmake.bat
-		)
+		copy winmake.bat downloads\lua-%LUA_VER%\etc\winmake.bat
 
 		cd downloads\lua-%LUA_VER%
 		call etc\winmake %COMPATFLAG%
