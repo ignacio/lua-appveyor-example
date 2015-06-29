@@ -105,7 +105,7 @@ if "%LUA%"=="luajit" (
 		)
 
 		mkdir downloads\lua-%LUA_VER%\etc 2> NUL
-		copy %~dp\winmake.bat downloads\lua-%LUA_VER%\etc\winmake.bat
+		copy %~dp0\winmake.bat downloads\lua-%LUA_VER%\etc\winmake.bat
 
 		cd downloads\lua-%LUA_VER%
 		call etc\winmake %COMPATFLAG%
