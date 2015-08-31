@@ -17,7 +17,26 @@ environment:
   - LUA_VER: 5.3.1  # Lua 5.3.1 with compatibility flags disabled.
     NOCOMPAT: true
   - LJ_VER: 2.0.4
-  - LJ_VER: 2.1
+ #- LJ_VER: 2.1 # disabled until the official release
+
+matrix:
+  allow_failures:
+    - configuration: 2010
+      platform: x64
+    - configuration: 2008
+      platform: x64
+    - configuration: MinGW
+      platform: x64
+
+# Abuse this section so we can have a matrix with different Compiler versions
+# Is there a better way? Like injecting an array in the matrix?
+configuration:
+ #- 2015 # disabled until LuaRocks supports it officially
+  - 2013
+  - 2012
+  - MinGW
+  - 2010 # only works for x86
+  - 2008 # only works for x86
 
 platform:
   - x86
@@ -27,12 +46,14 @@ cache:
   - c:\lua -> appveyor.yml
   - c:\external -> appveyor.yml
 
+# Skip unsupported combinations (ie, VS2008 for x64 is not supported)
 init:
-# Setup Lua development/build environment
-# Make VS 2013 command line tools available
-- call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\vcvarsall.bat" %platform%
+- if "%platform%" EQU "x64" ( for %%a in (2008 2010 MinGW) do ( if "%Configuration%"=="%%a" (echo "Skipping unsupported configuration" && exit /b 1 ) ) )
+
 
 install:
+# Make compiler command line tools available
+- call .appveyor\set_compiler_env.bat
 # Setup Lua development/build environment
 - call .appveyor\install.bat
 
@@ -44,8 +65,8 @@ build_script:
 - luarocks make rockspecs/foo-scm-0.rockspec
 
 before_test:
-# install test only deps
-- luarocks install telescope
+# install test only deps (if not already installed)
+- luarocks show telescope || luarocks install telescope
 
 test_script:
 - echo "Testing..."

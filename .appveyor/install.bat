@@ -79,7 +79,11 @@ if "%LUA%"=="luajit" (
 			cd !lj_source_folder!\src
 		)
 		:: Compiles LuaJIT
-		call msvcbuild.bat
+		if "%Configuration%"=="MinGW" (
+			call mingw32-make
+		) else (
+			call msvcbuild.bat
+		)
 
 		mkdir %LUA_DIR% 2> NUL
 		for %%a in (bin bin\lua bin\lua\jit include lib) do ( mkdir "%LUA_DIR%\%%a" )
@@ -122,9 +126,9 @@ call !LUA! -v
 
 
 
-:: =========================================================
+:: ==========================================================
 :: LuaRocks
-:: =========================================================
+:: ==========================================================
 
 if not exist "%LR_ROOT%" (
 	:: Downloads and installs LuaRocks
@@ -147,7 +151,11 @@ if not exist "%LR_ROOT%" (
 	)
 
 	cd downloads\luarocks-%LUAROCKS_VER%-win32
-	call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%" /TREE "%LR_SYSTREE%"
+	if "%Configuration%"=="MinGW" (
+		call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%" /TREE "%LR_SYSTREE%" /MW
+	) else (
+		call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%" /TREE "%LR_SYSTREE%"
+	)
 )
 
 if not exist "%LR_ROOT%" call :die "LuaRocks not found at %LR_ROOT%"

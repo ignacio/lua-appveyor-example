@@ -5,19 +5,32 @@
 
 This repository is intended as an example of how to integrate your Lua project with [AppVeyor](https://ci.appveyor.com/), providing you with continuous integration on a Windows environment.
 
-This sample builds a matrix with Lua (versions 5.1, 5.2 and 5.3) and LuaJIT (2.0 and 2.1). That means that each time you commit some changes, five jobs will be queued, so your code will be run using each of those versions.
+Just add `appveyor.yml` and the `.appveyor` folder to your repository, follow the steps to [enable integration](http://www.appveyor.com/docs) with AppVeyor and that's it.
+
+Each time you push some changes to your repository, or someone sends you a pull request, the code will be checked out, built and tested with different versions of Lua (and LuaJIT), for both 32 and 64 bits, using different compilers.
+
+All those combinations form what is known as a "build matrix". The matrix is comprised of "build jobs". Each build job will download and build a given Lua and LuaRocks version, using a given compiler, for the given platform. So, one build job could be "Lua 5.3.1 64 bits using Visual Studio 2015", another one could be "Lua 5.2.4 32 bits using MinGW", etc.
+
+- Supported Lua versions are 5.1, 5.2 and 5.3.
+- Supported LuaJIT versions are 2.0.4 and 2.1
+- Supported compilers are Visual Studio 2012 to 2015 (for both 32 and 64 bits), Visual Studio 2008 and 2010 (only for 32 bits) and MinGW (only for 32 bits).
+
+Note: It is best to edit the `appveyor.yml` file to suite your needs. You probably won't need to run tests using all those different compilers, or you're just interested in a certain Lua version. See the _Customizing the environment_ section below.
+
 So, each job will do the following:
 * Install the appropiate Lua (using [luawinmake](https://github.com/Tieske/luawinmake)) or LuaJIT version.
 * Install [LuaRocks](https://luarocks.org/) (2.2.2)
-* Build and install a sample Lua module containing C and Lua parts
+* Build and install a sample Lua module containing C and Lua parts, using the selected compiler.
 * Run tests using [Telescope](https://github.com/norman/telescope)
 
-This sample is based on Alexey Melnichuk's [lua-travis-example](https://github.com/moteus/lua-travis-example).
+This project is based on Alexey Melnichuk's [lua-travis-example](https://github.com/moteus/lua-travis-example).
 
 ## Customizing the environment
 
 By default, you can set a test matrix with different Lua and LuaJIT versions. Using the `LUA_VER` variable yo specify the full Lua version to use (i.e. 5.2.4).
 Using the `LJ_VER` variable, you specify the LuaJIT version to use (i.e. 2.0.4). LuaJIT 2.1 is special in that it is currently tracking the HEAD of its git repository.
+
+The C compiler to be used is chosen ìn the `configuration` section of the `appveyor.yml` file, and the platform (32 or 64 bits) is chosen in the `platform` section.
 
 The following variables can also be overridden if necessary:
 
