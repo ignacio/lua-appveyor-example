@@ -156,6 +156,27 @@ if not exist "%LR_ROOT%" (
 	) else (
 		call install.bat /LUA %LUA_DIR% /Q /LV %LUA_SHORTV% /P "%LUAROCKS_INSTALL%" /TREE "%LR_SYSTREE%"
 	)
+
+	:: Configures LuaRocks to instruct CMake the correct generator to use. Else, CMake will pick the highest
+	:: Visual Studio version installed
+	if "%Configuration%"=="MinGW" (
+		echo cmake_generator = "MinGW Makefiles" >> %LUAROCKS_INSTALL%\config.lua
+	)
+	if "%Configuration%"=="2015" (
+		echo cmake_generator = "Visual Studio 14 2015" >> %LUAROCKS_INSTALL%\config.lua
+	)
+	if "%Configuration%"=="2013" (
+		echo cmake_generator = "Visual Studio 12 2013" >> %LUAROCKS_INSTALL%\config.lua
+	)
+	if "%Configuration%"=="2012" (
+		echo cmake_generator = "Visual Studio 11 2011" >> %LUAROCKS_INSTALL%\config.lua
+	)
+	if "%Configuration%"=="2010" (
+		echo cmake_generator = "Visual Studio 10 2010" >> %LUAROCKS_INSTALL%\config.lua
+	)
+	if "%Configuration%"=="2008" (
+		echo cmake_generator = "Visual Studio 9 2008" >> %LUAROCKS_INSTALL%\config.lua
+	)
 )
 
 if not exist "%LR_ROOT%" call :die "LuaRocks not found at %LR_ROOT%"
