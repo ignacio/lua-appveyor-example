@@ -160,22 +160,18 @@ if not exist "%LR_ROOT%" (
 	:: Configures LuaRocks to instruct CMake the correct generator to use. Else, CMake will pick the highest
 	:: Visual Studio version installed
 	if "%Configuration%"=="MinGW" (
-		echo cmake_generator = "MinGW Makefiles" >> %LUAROCKS_INSTALL%\config.lua
-	)
-	if "%Configuration%"=="2015" (
-		echo cmake_generator = "Visual Studio 14 2015" >> %LUAROCKS_INSTALL%\config.lua
-	)
-	if "%Configuration%"=="2013" (
-		echo cmake_generator = "Visual Studio 12 2013" >> %LUAROCKS_INSTALL%\config.lua
-	)
-	if "%Configuration%"=="2012" (
-		echo cmake_generator = "Visual Studio 11 2011" >> %LUAROCKS_INSTALL%\config.lua
-	)
-	if "%Configuration%"=="2010" (
-		echo cmake_generator = "Visual Studio 10 2010" >> %LUAROCKS_INSTALL%\config.lua
-	)
-	if "%Configuration%"=="2008" (
-		echo cmake_generator = "Visual Studio 9 2008" >> %LUAROCKS_INSTALL%\config.lua
+		echo cmake_generator = "MinGW Makefiles" >> %LUAROCKS_INSTALL%\config-%LUA_SHORTV%.lua
+	) else (
+		set MSVS_GENERATORS[2008]=Visual Studio 9 2008
+		set MSVS_GENERATORS[2010]=Visual Studio 10 2010
+		set MSVS_GENERATORS[2012]=Visual Studio 11 2012
+		set MSVS_GENERATORS[2013]=Visual Studio 12 2013
+		set MSVS_GENERATORS[2015]=Visual Studio 14 2015
+
+		set CMAKE_GENERATOR=!MSVS_GENERATORS[%Configuration%]!
+		if "%platform%" EQU "x64" (set CMAKE_GENERATOR=!CMAKE_GENERATOR! Win64)
+
+		echo cmake_generator = "!CMAKE_GENERATOR!" >> %LUAROCKS_INSTALL%\config-%LUA_SHORTV%.lua
 	)
 )
 
@@ -260,4 +256,3 @@ goto :eof
 echo %1
 exit /B 1
 goto :eof
-
