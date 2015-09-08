@@ -170,6 +170,9 @@ if not exist "%LR_ROOT%" (
 	set MSVS_GENERATORS[2015]=Visual Studio 14 2015
 
 	set CMAKE_GENERATOR=!MSVS_GENERATORS[%Configuration%]!
+
+	if "%platform%" EQU "x64" (set CMAKE_GENERATOR=!CMAKE_GENERATOR! Win64)
+
 	echo cmake_generator = "!CMAKE_GENERATOR!" >> %LUAROCKS_INSTALL%\config.lua
 )
 
