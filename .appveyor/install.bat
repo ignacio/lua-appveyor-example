@@ -40,8 +40,8 @@ if defined NOCOMPAT (
 ) else (
 	set COMPATFLAG=
 )
-if not defined LUAJIT_GIT_REPO set LUAJIT_GIT_REPO=http://luajit.org/git/luajit-2.0.git
-if not defined LUAJIT_URL set LUAJIT_URL=http://luajit.org/download
+if not defined LUAJIT_GIT_REPO set LUAJIT_GIT_REPO=https://github.com/LuaJIT/LuaJIT.git
+if not defined LUAJIT_URL set LUAJIT_URL=https://github.com/LuaJIT/LuaJIT/archive
 
 if not defined LR_EXTERNAL set LR_EXTERNAL=c:\external
 if not defined LUAROCKS_INSTALL set LUAROCKS_INSTALL=%LUA_DIR%\LuaRocks
@@ -73,8 +73,8 @@ if "%LUA%"=="luajit" (
 		) else (
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
-				echo Downloading... %LUAJIT_URL%/LuaJIT-%LJ_VER%.tar.gz
-				curl --silent --fail --max-time 120 --connect-timeout 30 %LUAJIT_URL%/LuaJIT-%LJ_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
+				echo Downloading... %LUAJIT_URL%/v%LJ_VER%.tar.gz
+				curl --location --silent --fail --max-time 120 --connect-timeout 30 %LUAJIT_URL%/v%LJ_VER%.tar.gz | %SEVENZIP% x -si -so -tgzip | %SEVENZIP% x -si -ttar -aoa -odownloads
 			)
 			cd !lj_source_folder!\src
 		)
