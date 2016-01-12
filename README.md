@@ -19,7 +19,7 @@ Note: It is best to edit the `appveyor.yml` file to suite your needs. You probab
 
 So, each job will do the following:
 * Install the appropiate Lua (using [luawinmake](https://github.com/Tieske/luawinmake)) or LuaJIT version.
-* Install [LuaRocks](https://luarocks.org/) (2.2.2)
+* Install [LuaRocks](https://luarocks.org/) (2.3.0)
 * Build and install a sample Lua module containing C and Lua parts, using the selected compiler.
 * Run tests using [Telescope](https://github.com/norman/telescope)
 
