@@ -1,0 +1,20 @@
+return {
+  configfile  = ".luacov",
+  statsfile   = "luacov.stats.out",
+  reportfile  = "luacov.report.json",
+  runreport   = false,
+  deletestats = false,
+
+  include = {
+    "/foo$",
+    "/foo/.+$",
+  },
+
+  exclude = {},
+
+  coveralls = {
+    pathcorrect = {
+      {"^.-[/\\]share[/\\]lua[/\\]5.%d", "src/lua"};
+    },
+  },
+}

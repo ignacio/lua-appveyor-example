@@ -1,5 +1,6 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/subf1ydrutspjtk8/branch/master?svg=true)](https://ci.appveyor.com/project/ignacio/lua-appveyor-example/branch/master)
 [![License](http://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
+[![Coverage Status](https://coveralls.io/repos/github/ignacio/lua-appveyor-example/badge.svg?branch=luacov)](https://coveralls.io/github/ignacio/lua-appveyor-example?branch=luacov)
 
 # lua-appveyor-example
 
@@ -21,7 +22,8 @@ So, each job will do the following:
 * Install the appropiate Lua (using [luawinmake](https://github.com/Tieske/luawinmake)) or LuaJIT version.
 * Install [LuaRocks](https://luarocks.org/) (2.3.0)
 * Build and install a sample Lua module containing C and Lua parts, using the selected compiler.
-* Run tests using [Telescope](https://github.com/norman/telescope)
+* Run tests using [Busted](http://olivinelabs.com/busted/)
+* Uploads a coverage report to [coveralls.io](https://coveralls.io/) using [luacov](https://keplerproject.github.io/luacov/) and [luacov-coveralls](https://github.com/moteus/luacov-coveralls).
 
 This project is based on Alexey Melnichuk's [lua-travis-example](https://github.com/moteus/lua-travis-example).
 
