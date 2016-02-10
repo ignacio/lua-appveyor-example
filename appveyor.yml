@@ -77,8 +77,5 @@ test_script:
 
 after_test:
   - if "%LUA_VER:~0,3%"=="5.1" (luarocks show bit32 || luarocks install bit32)
-  - luarocks show dkjson || luarocks install dkjson
-  - luarocks show luafilesystem || luarocks install luafilesystem
-  - luarocks show lua-path || luarocks install lua-path
-  - luarocks show luacov-coveralls || luarocks install luacov-coveralls --server=https://luarocks.org/dev --deps-mode=none
+  - luarocks show luacov-coveralls || luarocks install luacov-coveralls
   - luacov-coveralls -v -e c:\lua -c spec\.luacov
