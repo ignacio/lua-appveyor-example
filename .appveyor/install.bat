@@ -75,13 +75,13 @@ if "%LUA%"=="luajit" (
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
 				echo Cloning git repo %LUAJIT_GIT_REPO% !lj_source_folder!
-				git clone %LUAJIT_GIT_REPO% !lj_source_folder! || call :die "Failed to clone repository"
+				git clone --depth 1 --branch=v2.1 %LUAJIT_GIT_REPO% !lj_source_folder! || call :die "Failed to clone repository"
 			) else (
 				cd !lj_source_folder!
 				git pull || call :die "Failed to update repository"
+				git checkout v2.1 || call :die
 			)
 			cd !lj_source_folder!\src
-			git checkout v2.1 || call :die
 		) else (
 			set lj_source_folder=%APPVEYOR_BUILD_FOLDER%\downloads\luajit-%LJ_VER%
 			if not exist !lj_source_folder! (
