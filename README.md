@@ -20,7 +20,7 @@ Note: It is best to edit the `appveyor.yml` file to suite your needs. You probab
 
 So, each job will do the following:
 * Install the appropiate Lua (using [luawinmake](https://github.com/Tieske/luawinmake)) or LuaJIT version.
-* Install [LuaRocks](https://luarocks.org/) (2.3.0)
+* Install [LuaRocks](https://luarocks.org/) (2.4.1)
 * Build and install a sample Lua module containing C and Lua parts, using the selected compiler.
 * Run tests using [Busted](http://olivinelabs.com/busted/)
 * Uploads a coverage report to [coveralls.io](https://coveralls.io/) using [luacov](https://keplerproject.github.io/luacov/) and [luacov-coveralls](https://github.com/moteus/luacov-coveralls).
